@@ -13,9 +13,10 @@
 - **Premium UI/UX Design**: Uses a curated navy and gold color palette, glassmorphism elements, and professional typography (`Bodoni Moda` and `Jost`).
 - **Fully Responsive**: Optimized layout that scales perfectly across desktops, tablets, and mobile devices.
 - **Dark & Light Mode**: Built-in CSS variable-based theming allowing users to seamlessly toggle between dark and light modes.
-- **Serverless Form Handling**: Contact and Email modals are fully integrated with Google Apps Script to send emails without requiring any backend server.
-- **Micro-Interactions & Animations**: Features smooth `IntersectionObserver` fade-ins, animated numerical counters, and custom toast notifications.
-- **WhatsApp Integration**: Direct one-click WhatsApp routing for quick product inquiries and general chat.
+- **Advanced Serverless Email System**: Powered by Google Apps Script, featuring beautifully formatted HTML templates for company notifications, automated customer confirmation emails, and dynamic `Reply-To` headers.
+- **Real-Time Form Validation**: Robust client-side validation built into JavaScript ensuring strict phone number formatting (exactly 10 digits) and alphabet-only name inputs for data integrity.
+- **Global WhatsApp Modals**: Dedicated General and Product-specific WhatsApp modals designed to capture precise requirements before seamlessly routing the user to the WhatsApp app.
+- **Micro-Interactions & Animations**: Features smooth `IntersectionObserver` fade-ins, animated numerical counters, and custom top-center sliding toast notifications for success/error states.
 - **Modern CSS Architecture**: Utilizes native CSS variables, flexbox, CSS Grid, and custom scrollbars.
 
 ---
@@ -75,12 +76,15 @@ Since this project uses vanilla web technologies, no build tools or package mana
 
 ## ✉️ Email Configuration (Google Apps Script)
 
-The website's contact forms use a serverless architecture via Google Apps Script to forward submissions to your email. 
+The website uses a robust serverless architecture via Google Apps Script to forward form submissions to your email. It includes **HTML Email Templates**, an **Auto-Reply feature** for the sender, and dynamic **Reply-To routing**.
 
-To update the endpoint:
-1. Open `js/main.js`.
-2. Locate the `scriptURL` variable inside the `initContactForm` and `initEmailModal` functions.
-3. Replace the string with your own deployed Google Apps Script URL.
+To update or manage the endpoint:
+1. Open the included `Google_Apps_Script_Code.js` file.
+2. Copy its contents into your Google Apps Script dashboard (`script.google.com`).
+3. Deploy it as a **New Version** Web App.
+4. Copy the Web App URL.
+5. Open `js/main.js` and locate the `scriptURL` variable inside the `initContactForm` and `initEmailModal` functions.
+6. Replace the string with your newly deployed Google Apps Script URL.
 
 ```javascript
 const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
