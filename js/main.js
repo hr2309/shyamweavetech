@@ -731,4 +731,35 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  /* ══════════════════════════════════════════════
+     FORM VALIDATION ENHANCEMENTS
+  ══════════════════════════════════════════════ */
+  function initFormValidation() {
+    // Phone Validation: 10 digits only
+    const phoneInputs = document.querySelectorAll('input[type="tel"], input[name="phone"], input[id*="phone"]');
+    phoneInputs.forEach(input => {
+      input.setAttribute('maxlength', '10');
+      input.setAttribute('pattern', '[0-9]{10}');
+      input.setAttribute('title', 'Please enter exactly 10 digits');
+      
+      input.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, ''); // Remove non-digits
+      });
+    });
+
+    // Name Validation: Letters and spaces only
+    const nameInputs = document.querySelectorAll('input[name="name"], input[id*="name"]');
+    nameInputs.forEach(input => {
+      input.setAttribute('pattern', '[A-Za-z\\s\\-\\.\']{2,}');
+      input.setAttribute('title', 'Please enter a valid name (letters only)');
+      
+      input.addEventListener('input', function() {
+        this.value = this.value.replace(/[^a-zA-Z\s\-\.\']/g, ''); // Remove numbers/special chars
+      });
+    });
+  }
+
+  initFormValidation();
+
 });
