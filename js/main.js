@@ -12,12 +12,12 @@
   const WA_BASE = `https://wa.me/${WA_NUMBER}`;
 
   const WA_MSG_GENERAL = encodeURIComponent(
-    'Hello Shyam Weavetech,\n\nI would like to know more about your products.\n\nPlease contact me.\n\nThank you.'
+    'Hello *Shyam* Weavetech,\n\nI would like to know more about your products.\n\nPlease contact me.\n\nThank you.'
   );
 
   function waProductMsg(productName) {
     return encodeURIComponent(
-      `Hello Shyam Weavetech,\n\nI am interested in:\n\nProduct: ${productName}\n\nRequired Quantity:\n\nApplication:\n\nDelivery Location:\n\nAdditional Requirements:\n\nPlease send quotation.\n\nThank you.`
+      `Hello *Shyam* Weavetech,\n\nI am interested in:\n\nProduct: ${productName}\n\nRequired Quantity:\n\nApplication:\n\nDelivery Location:\n\nAdditional Requirements:\n\nPlease send quotation.\n\nThank you.`
     );
   }
 
@@ -53,8 +53,11 @@
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(20px)';
       setTimeout(() => document.body.contains(toast) && document.body.removeChild(toast), 300);
-    }, 4500);
+    }, 4000);
   }
+
+  // Expose to global scope so it can be used outside IIFE
+  window.showToast = showToast;
 
   /* ══════════════════════════════════════════════
      THEME (Dark / Light)
@@ -219,19 +222,48 @@
     }
 
     // General WA buttons
+    const waGeneralModal = document.getElementById('wa-general-modal-overlay');
+
     document.querySelectorAll('[data-wa="general"]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        window.open(`${WA_BASE}?text=${WA_MSG_GENERAL}`, '_blank', 'noopener,noreferrer');
+        if(waGeneralModal) {
+          waGeneralModal.classList.add('active');
+        } else {
+          window.open(`${WA_BASE}?text=${WA_MSG_GENERAL}`, '_blank', 'noopener,noreferrer');
+        }
       });
     });
 
-    // Product enquiry buttons
+    // Product enquiry buttons (WhatsApp)
+    const waModal = document.getElementById('wa-modal-overlay');
+    const waProductInput = document.getElementById('wa-modal-product');
+
     document.querySelectorAll('[data-wa-product]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         const product = btn.dataset.waProduct;
-        window.open(`${WA_BASE}?text=${waProductMsg(product)}`, '_blank', 'noopener,noreferrer');
+        if(waModal && waProductInput) {
+          waProductInput.value = product;
+          waModal.classList.add('active');
+        } else {
+          window.open(`${WA_BASE}?text=${waProductMsg(product)}`, '_blank', 'noopener,noreferrer');
+        }
+      });
+    });
+
+    // Product enquiry buttons (Email)
+    const emailProductModal = document.getElementById('email-product-modal-overlay');
+    const emailProductInput = document.getElementById('email-product-modal-product');
+
+    document.querySelectorAll('[data-email-product]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const product = btn.dataset.emailProduct;
+        if(emailProductModal && emailProductInput) {
+          emailProductInput.value = product;
+          emailProductModal.classList.add('active');
+        }
       });
     });
   }
@@ -511,21 +543,99 @@
 
 })();
 
-// WhatsApp Modal Logic
-(function() {
-  const modal = document.getElementById('wa-modal-overlay');
-  const closeBtn = document.getElementById('wa-modal-close');
-  const triggers = document.querySelectorAll('.wa-modal-trigger');
-  const form = document.getElementById('wa-modal-form');
+// Product Email Modal Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('email-product-modal-overlay');
+  const closeBtn = document.getElementById('email-product-modal-close');
+  const form = document.getElementById('email-product-modal-form');
 
   if(modal && closeBtn && form) {
-    triggers.forEach(t => {
-      t.addEventListener('click', (e) => {
-        e.preventDefault();
-        modal.classList.add('active');
-      });
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('active');
     });
 
+    modal.addEventListener('click', (e) => {
+      if(e.target === modal) modal.classList.remove('active');
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent || "Send Message";
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
+      const product = document.getElementById('email-product-modal-product').value;
+      const name = document.getElementById('email-product-modal-name').value;
+      const email = document.getElementById('email-product-modal-email').value;
+      const phone = document.getElementById('email-product-modal-phone').value;
+      const quantity = document.getElementById('email-product-modal-quantity').value;
+      const location = document.getElementById('email-product-modal-location').value;
+      const requirements = document.getElementById('email-product-modal-requirements').value;
+
+      const lines = [
+        `Hello Shyam Weavetech,`,
+        ``,
+        `I am interested in:`,
+        ``,
+        `Product: ${product}`,
+        `Quantity: ${quantity} Kgs`,
+        `Location: ${location}`
+      ];
+
+      if(requirements && requirements.trim() !== '') {
+        lines.push(`Additional Details: ${requirements}`);
+      }
+
+      lines.push(``);
+      lines.push(`My Contact Details:`);
+      lines.push(`Phone: ${phone}`);
+      lines.push(`Email: ${email}`);
+      lines.push(``);
+      lines.push(`Please send quotation. Thank you.`);
+
+      const fullMessage = lines.join('\n');
+
+      try {
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzOjoHV173DUcOdUrHWP01Zj3ylSFX4Xi88klkut-oKDLU1nJblagkc53nghPOVlEzm/exec';
+        
+        await fetch(scriptURL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'text/plain'
+          },
+          body: JSON.stringify({
+            name: name,
+            email: email,
+            purpose: `Product Enquiry: ${product}`,
+            message: fullMessage
+          })
+        });
+        
+        // We use showToast which is now globally available
+        window.showToast("Thank you! Shyam Weavetech got your request via email.");
+        modal.classList.remove('active');
+        form.reset();
+      } catch (error) {
+        window.showToast("Error sending email. Please try again.", "error");
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  }
+});
+
+// General WhatsApp Modal Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const WA_URL = 'https://wa.me/919054141504';
+  const modal = document.getElementById('wa-general-modal-overlay');
+  const closeBtn = document.getElementById('wa-general-modal-close');
+  const form = document.getElementById('wa-general-modal-form');
+
+  if(modal && closeBtn && form) {
     closeBtn.addEventListener('click', () => {
       modal.classList.remove('active');
     });
@@ -536,24 +646,86 @@
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = document.getElementById('wa-modal-name').value;
-      const topic = document.getElementById('wa-modal-topic').value;
-      const details = document.getElementById('wa-modal-details').value;
+      try {
+        const purpose = document.getElementById('wa-general-modal-purpose').value;
+        const name = document.getElementById('wa-general-modal-name').value;
+        const message = document.getElementById('wa-general-modal-message').value;
 
-      const lines = [
-        '*WhatsApp Enquiry*',
-        `*Name:* ${name}`,
-        `*Topic:* ${topic}`,
-        '',
-        '*Details:*',
-        details
-      ];
+        const lines = [
+          `Hello Shyam Weavetech,`,
+          ``,
+          `My name is *${name}*.`,
+          ``,
+          `*Purpose:* ${purpose}`,
+          `*Message:* ${message}`,
+          ``,
+          `Please let me know how we can proceed.`,
+          `Thank you.`
+        ];
 
-      const text = encodeURIComponent(lines.join('\n'));
-      window.open(`https://wa.me/919054141504?text=${text}`, '_blank', 'noopener,noreferrer');
+        const text = encodeURIComponent(lines.join('\n'));
+        window.open(`${WA_URL}?text=${text}`, '_blank', 'noopener,noreferrer');
 
-      modal.classList.remove('active');
-      form.reset();
+        modal.classList.remove('active');
+        form.reset();
+      } catch (err) {
+        console.error("Error formatting WA message:", err);
+      }
     });
   }
-})();
+});
+
+// WhatsApp Modal Logic (Product)
+document.addEventListener('DOMContentLoaded', () => {
+  const WA_URL = 'https://wa.me/919054141504';
+  const modal = document.getElementById('wa-modal-overlay');
+  const closeBtn = document.getElementById('wa-modal-close');
+  const form = document.getElementById('wa-modal-form');
+
+  if(modal && closeBtn && form) {
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if(e.target === modal) modal.classList.remove('active');
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      try {
+        const product = document.getElementById('wa-modal-product').value;
+        const quantity = document.getElementById('wa-modal-quantity').value;
+        const location = document.getElementById('wa-modal-location').value;
+        const requirements = document.getElementById('wa-modal-requirements').value;
+
+        const lines = [
+          `Hello *Shyam* Weavetech,`,
+          ``,
+          `I am interested in:`,
+          ``,
+          `*Product:* ${product}`,
+          `*Quantity:* ${quantity} Kgs`,
+          `*Location:* ${location}`
+        ];
+
+        if(requirements && requirements.trim() !== '') {
+          lines.push(`*Additional Details:* ${requirements}`);
+        }
+
+        lines.push(``);
+        lines.push(`Please send quotation.`);
+        lines.push(``);
+        lines.push(`Thank you.`);
+
+        const text = encodeURIComponent(lines.join('\n'));
+        window.open(`${WA_URL}?text=${text}`, '_blank', 'noopener,noreferrer');
+
+        modal.classList.remove('active');
+        form.reset();
+      } catch (err) {
+        console.error("Error formatting WA message:", err);
+      }
+    });
+  }
+});

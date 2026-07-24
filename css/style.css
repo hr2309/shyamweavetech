@@ -71,6 +71,7 @@
   --shadow-sm:      0 1px 3px rgba(0,0,0,0.3);
   --shadow-md:      0 4px 16px rgba(0,0,0,0.3);
   --shadow-lg:      0 10px 40px rgba(0,0,0,0.4);
+  --gold-pale:      rgba(201,162,39,0.15);
 }
 
 /* ── Reset & Base ── */
@@ -595,6 +596,8 @@ p { color: var(--text-secondary); }
   gap: 5px;
   cursor: pointer;
   padding: 4px;
+  background: transparent;
+  border: none;
 }
 
 .hamburger span {
@@ -643,7 +646,7 @@ p { color: var(--text-secondary); }
 
 .mobile-nav-link:hover {
   background: var(--gold-pale);
-  color: var(--navy);
+  color: var(--gold);
 }
 
 /* ── Scroll Progress ── */
@@ -2138,11 +2141,12 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 
 @media (max-width: 640px) {
   :root { --section-pad: 56px 0; }
+  html { font-size: 15px; }
   .grid-3 { grid-template-columns: 1fr; }
   .grid-4 { grid-template-columns: 1fr; }
   .grid-6 { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
-  .process-steps { grid-template-columns: 1fr 1fr; }
+  .process-steps { grid-template-columns: 1fr; }
   .quality-steps-grid { grid-template-columns: 1fr; }
   .gallery-grid { grid-template-columns: 1fr; }
   .contact-form-wrap { padding: 28px; }
@@ -2155,6 +2159,12 @@ textarea.form-control { resize: vertical; min-height: 120px; }
   .about-preview-image img { height: 300px; }
   #scroll-top { bottom: 16px; right: 16px; }
   #whatsapp-float { bottom: 16px; left: 16px; }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 14px; }
+  .email-modal-box, .wa-modal-box { padding: 24px 20px; }
+  .stats-grid { grid-template-columns: 1fr; }
 }
 
 /* ── Utility ── */
@@ -2566,4 +2576,14 @@ textarea.form-control { resize: vertical; min-height: 120px; }
   .nav-actions .nav-query-btn {
     display: none !important;
   }
+}
+
+/* Fix visibility of View All Products button */
+#view-all-products-btn {
+  color: var(--text-primary);
+  border-color: var(--text-primary);
+}
+#view-all-products-btn:hover {
+  background: var(--text-primary);
+  color: var(--bg-primary);
 }
