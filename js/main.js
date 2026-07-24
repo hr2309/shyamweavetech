@@ -27,8 +27,11 @@
   function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.style.position = 'fixed';
-    toast.style.bottom = '24px';
-    toast.style.right = '24px';
+    toast.style.top = '100px';
+    toast.style.left = '50%';
+    toast.style.width = 'max-content';
+    toast.style.maxWidth = '90vw';
+    toast.style.textAlign = 'center';
     toast.style.background = type === 'success' ? '#25D366' : '#e74c3c';
     toast.style.color = '#fff';
     toast.style.padding = '16px 24px';
@@ -39,19 +42,19 @@
     toast.style.fontSize = '0.95rem';
     toast.style.fontWeight = '500';
     toast.style.opacity = '0';
-    toast.style.transform = 'translateY(20px)';
+    toast.style.transform = 'translate(-50%, -20px)';
     toast.style.transition = 'all 0.3s ease';
     toast.textContent = message;
     document.body.appendChild(toast);
 
     setTimeout(() => {
       toast.style.opacity = '1';
-      toast.style.transform = 'translateY(0)';
+      toast.style.transform = 'translate(-50%, 0)';
     }, 10);
 
     setTimeout(() => {
       toast.style.opacity = '0';
-      toast.style.transform = 'translateY(20px)';
+      toast.style.transform = 'translate(-50%, -20px)';
       setTimeout(() => document.body.contains(toast) && document.body.removeChild(toast), 300);
     }, 4000);
   }

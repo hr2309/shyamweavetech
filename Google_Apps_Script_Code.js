@@ -74,7 +74,8 @@ function doPost(e) {
     MailApp.sendEmail({
       to: companyEmail,
       subject: companySubject,
-      htmlBody: companyHtmlBody
+      htmlBody: companyHtmlBody,
+      replyTo: userEmail || companyEmail
     });
 
     // ==========================================
